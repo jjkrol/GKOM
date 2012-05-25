@@ -87,6 +87,7 @@
     <ClInclude Include="Edge.h" />
     <ClInclude Include="gkom.h" />
     <ClInclude Include="glIncl.h" />
+    <ClInclude Include="Interface.h" />
     <ClInclude Include="JPEG.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Road.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="gkom.cpp" />
+    <ClCompile Include="Interface.cpp" />
     <ClCompile Include="jpeg.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="stdafx.cpp">

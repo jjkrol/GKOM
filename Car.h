@@ -25,6 +25,7 @@ public:
 	void getPossibleDirections(bool * table);
 	void setNextTurn(Direction dir);
 	void setNewTarget();
+	float getSpeed(){return speed;}
 	Arrow * getArrow(){return arr;}
 	Direction getNextTurn();
 	double getRotY();

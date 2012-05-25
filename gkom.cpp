@@ -30,15 +30,7 @@ bool paused = true;
 const double floorHeight = 10;
 const int mapSize = 512;
 UINT heightMap[mapSize*mapSize*3];
-LPVOID glutFonts[7] = { 
-    GLUT_BITMAP_9_BY_15, 
-    GLUT_BITMAP_8_BY_13, 
-    GLUT_BITMAP_TIMES_ROMAN_10, 
-    GLUT_BITMAP_TIMES_ROMAN_24, 
-    GLUT_BITMAP_HELVETICA_10, 
-    GLUT_BITMAP_HELVETICA_12, 
-    GLUT_BITMAP_HELVETICA_18 
-}; 
+
 Building * buildings[segmentCount][segmentCount];
 
 vector<Car*> cars;
@@ -407,21 +399,7 @@ void drawCars(){
 	}
 }
 
-void glutPrint(double x, double y, double z,
-	LPVOID font, char* text,
-	double r, double g, double b, double a) { 
-    if(!text || !strlen(text)) return; 
-    bool blending = false; 
-    if(glIsEnabled(GL_BLEND)) blending = true; 
-    glEnable(GL_BLEND); 
-    glColor4d(r,g,b,a); 
-    glRasterPos3d(x,y,z); 
-    while (*text) { 
-        glutBitmapCharacter(font, *text); 
-        text++; 
-    } 
-    if(!blending) glDisable(GL_BLEND); 
-}  
+
 
 void displayObjects(){
 	glPushMatrix();
@@ -444,97 +422,7 @@ void displayObjects(){
 
 }
 
-void drawTextButton(char* text){
- 	glPushMatrix();
- 	glColor3f(0.8, 0.0, 0.0);
-	glBegin(GL_QUADS);
-		glVertex3f(0,0,-0.01f);
-		glVertex3f(0,0.2,-0.01f);
-		glVertex3f(0.2,0.2,-0.01f);
-		glVertex3f(0.2,0,-0.01f);
-	glEnd();
-	glutPrint(0.1f, 0.1f, 0.0f , glutFonts[6], text, 0.0f, 0.0f, 1.0f, 0.5f);
 
- 	glPopMatrix();
-}
-
-void drawInterface(){
-	GLfloat light0_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
-	GLfloat light0_diffuse[] = {strength, strength, strength, 1.0f};	
-	GLfloat light0_specular[] = {1, 1, 1, 1.0f};
-	GLfloat light0_emission[] = {0, 0, 0, 1.0f};
-	GLfloat light0_position[] = {0, 0, 0, 1};
-	glLightfv(GL_LIGHT1, GL_POSITION, light0_position );
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light0_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light0_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light0_specular);
-	glEnable( GL_LIGHT2 );
-	glPushMatrix();
-
-	glLoadName(9);
-	
-	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-	glTranslatef(0.0, 0.0, -1);
-	glTranslated(-0.76*(float)windowWidth/(float)1024,
-		-0.55*(float)windowHeight/(float)768,0);
-	if(cam->isFollowing()){
-	string text;	
-		bool dirs[4];	
-		Car * followedCar = cam->getFollowedCar();
-		followedCar->getPossibleDirections(dirs);
-		glPushMatrix();
-		double col[4][3]  = {
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f,
-			0.0f, 0.0f, 1.0f
-		};
-		Direction dir;
-		if((dir = followedCar->getNextTurn()) != NONE){
-			col[dir][0] = 0.0f;
-			col[dir][1] = 1.0f;
-			col[dir][2] = 0.0f;
-		}
-
-		if(dirs[0])
-			glutPrint(0.2f, 0.2f, 0.0f , glutFonts[6], "gora", col[0][0], col[0][1], col[0][2], 1.0f);
-		if(dirs[1])
-			glutPrint(0.1f, 0.15f, 0.0f , glutFonts[6], "lewo", col[1][0], col[1][1], col[1][2], 1.0f);
-		if(dirs[2])
-			glutPrint(0.2f, 0.1f, 0.0f , glutFonts[6], "dol", col[2][0], col[2][1], col[2][2], 1.0f);
-		if(dirs[3])
-			glutPrint(0.3f, 0.15f, 0.0f , glutFonts[6], "prawo", col[3][0], col[3][1], col[3][2], 1.0f);
-
-		//glutPrint(0.2f, 0.35f, 0.0f , glutFonts[6], "Aktualny kierunek:", 0.0f, 0.0f, 1.0f, 0.5f);
-		switch(followedCar->getCurrentDirection()){
-		case 0:
-			text = "NORTH";
-			break;
-		case 1:
-			text = "SOUTH";
-			break;
-		case 2:
-			text = "WEST";
-			break;
-		case 3:
-			text = "EAST";
-			break;
-		case 4:
-			text = "NONE";
-			break;
-		}
-		char* s = new char[ text.length() + 1 ];
-		strcpy( s, text.c_str() );
-		//glutPrint(0.2f, 0.25f, 0.0f , glutFonts[6], s, 0.0f, 0.0f, 1.0f, 0.5f);
-		delete [] s;
-		glPopMatrix();
-
- 	//drawTextButton("Hello world");
-	}
-	
-	glPopMatrix();
-}
 
 void display(){
 	glClearColor (0.0,0.0,0.0,1.0); //clear the screen to black
@@ -544,7 +432,8 @@ void display(){
  
 	glPushMatrix();
 	init();
-		drawInterface();
+	Interface * inter = new Interface(cam);
+	inter->draw();
 	cam->draw();
 	displayObjects();
  	glTranslatef(0.0, 0.0, -5.0);
@@ -569,8 +458,7 @@ void display(){
 
 }
 
-void reshape(GLsizei w, GLsizei h)
-{
+void reshape(GLsizei w, GLsizei h) {
 	glViewport (0, 0, (GLsizei)w, (GLsizei)h); //set the viewport to the current window specifications
 
 	glMatrixMode (GL_PROJECTION); //set the matrix to projection
@@ -582,8 +470,7 @@ void reshape(GLsizei w, GLsizei h)
 
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
+void keyboard(unsigned char key, int x, int y) {
 	if (key=='5') cam->incZ();
 	if (key=='0') cam->decZ();
 	if (key=='6') cam->incX();
@@ -683,73 +570,26 @@ extern "C" {
  	GLint hits, view[4];
  	int id;
  
- 	/*
- 		This choose the buffer where store the values for the selection data
- 	*/
  	glSelectBuffer(64, buff);
- 
- 	/*
- 		This retrieve info about the viewport
- 	*/
  	glGetIntegerv(GL_VIEWPORT, view);
- 
- 	/*
- 		Switching in selecton mode
- 	*/
  	glRenderMode(GL_SELECT);
- 
- 	/*
- 		Clearing the name's stack
- 		This stack contains all the info about the objects
- 	*/
  	glInitNames();
- 
- 	/*
- 		Now fill the stack with one element (or glLoadName will generate an error)
- 	*/
  	glPushName(0);
- 
- 	/*
- 		Now modify the vieving volume, restricting selection area around the cursor
- 	*/
  	glMatrixMode(GL_PROJECTION);
  	glPushMatrix();
  		glLoadIdentity();
- 
- 		/*
- 			restrict the draw to an area around the cursor
- 		*/
  		gluPickMatrix(x, y, 1.0, 1.0, view);
 		gluPerspective (60,
 			(GLfloat)glutGet(GLUT_WINDOW_WIDTH) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT),
 			1.0, 1500.0); //set the perspective (angle of sight, width, height, , depth)
- 
- 		/*
- 			Draw the objects onto the screen
- 		*/
  		glMatrixMode(GL_MODELVIEW);
- 
- 		/*
- 			draw only the names in the stack, and fill the array
- 		*/
  		glutSwapBuffers();
  		display();
- 
- 		/*
- 			Do you remeber? We do pushMatrix in PROJECTION mode
- 		*/
  		glMatrixMode(GL_PROJECTION);
  	glPopMatrix();
- 
- 	/*
- 		get number of objects drawed in that area
- 		and return to render mode
- 	*/
  	hits = glRenderMode(GL_RENDER);
- 
- 	/*
- 		Print a list of the objects
- 	*/
+
+	//get id form buffer
    unsigned int i, j;
    GLuint names, *ptr, minZ,*ptrNames, numberOfNames;
 
@@ -768,6 +608,8 @@ extern "C" {
 	  ptr += names+2;
 	}
   ptr = ptrNames;
+
+  //get clicked Car
   int clickedId = *ptr;
   cout<<clickedId<<endl;
   vector<Car*>::iterator it;
@@ -776,29 +618,7 @@ extern "C" {
 			cam->follow(*it);
 	}
  
- 	/*
- 		uncomment this to show the whole buffer
- 	* /
- 	gl_selall(hits, buff);
- 	*/
- 
  	glMatrixMode(GL_MODELVIEW);
- }
- 
- void gl_selall(GLint hits, GLuint *buff)
- {
- 	GLuint *p;
- 	int i;
- 
- 	display();
- 
- 	p = buff;
- 	for (i = 0; i < 6 * 4; i++)
- 	{
- 		printf("Slot %d: - Value: %d\n", i, p[i]);
- 	}
- 
- 	printf("Buff size: %x\n", (GLbyte)buff[0]);
  }
  
  void draw_block(float x, float y, float z){
@@ -808,45 +628,11 @@ extern "C" {
  	glPopMatrix();
  }
  
- void list_hits(GLint hits, GLuint *names)
- {
- 	int i;
- 
- 	/*
- 		For each hit in the buffer are allocated 4 bytes:
- 		1. Number of hits selected (always one,
- 									beacuse when we draw each object
- 									we use glLoadName, so we replace the
- 									prevous name in the stack)
- 		2. Min Z
- 		3. Max Z
- 		4. Name of the hit (glLoadName)
- 	*/
- 
- 	printf("%d hits:\n", hits);
- 
- 	for (i = 0; i < hits; i++)
- 		printf(	"Number: %d\n"
- 				"Min Z: %d\n"
- 				"Max Z: %d\n"
- 				"Name on stack: %d\n",
- 				(GLubyte)names[i * 4],
- 				(GLubyte)names[i * 4 + 1],
- 				(GLubyte)names[i * 4 + 2],
- 				(GLubyte)names[i * 4 + 3]
- 				);
- 
- 	printf("\n");
- }
+
 #define WI 1024
 #define HE 768
- int main(int argc, char **argv)
- {
+ int main(int argc, char **argv) {
 srand(time(NULL));
-
-	//glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
-
-
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE);

@@ -17,6 +17,7 @@
 #include "Arrow.h"
 #include "Vertex.h"
 #include "Edge.h"
+#include "Interface.h"
 
 #define SKYFRONT 0						// Give Front ID = 0
 #define SKYBACK  1						// Give Back  ID = 1
