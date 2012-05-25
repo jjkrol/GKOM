@@ -21,7 +21,9 @@ public:
 	void faster(){speed += 0.01; if(speed > 0.4) speed = 0.4;}
 	void slower(){speed -= 0.01; if(speed < 0) speed = 0;}
 	void toggleArrow(){showArrow = !showArrow;}
+	bool isShowArrow(){return showArrow;}
 	void toggleNextPoint(){showNextPoint= !showNextPoint;}
+	bool isShowNextPoint(){return showNextPoint;}
 	void getPossibleDirections(bool * table);
 	void setNextTurn(Direction dir);
 	void setNewTarget();

@@ -12,8 +12,14 @@ public:
 	Interface(Camera * cam);
 	~Interface(void);
 	void draw();
+	void objectClicked(int id);
 private:
 	Camera * cam;
-	void drawTextButton(char * text);
+	Car * followedCar;
+	void drawTextButton(char * text, bool state);
+	void setPosition();
+	void drawSpeedometer();
+	void drawDirectionChooser();
+	void drawToggleButtons();
 }; 
 

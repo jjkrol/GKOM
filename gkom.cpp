@@ -11,7 +11,7 @@
 	height mapa
 	efekty?
 	Ÿle skrêca kiedy jedzie za szybko
-
+	enum do obiektow w interfejsie
 */
 
 using namespace std;
@@ -30,6 +30,7 @@ bool paused = true;
 const double floorHeight = 10;
 const int mapSize = 512;
 UINT heightMap[mapSize*mapSize*3];
+Interface * inter;
 
 Building * buildings[segmentCount][segmentCount];
 
@@ -43,7 +44,7 @@ UINT roadTexture[1];
  
  int selected = 0;
  
- void gl_select(int x, int y);
+ void glSelect(int x, int y);
  void gl_selall(GLint hits, GLuint *buff);
  void mouseClick();
  void mousedw(int x, int y, int but);
@@ -399,8 +400,6 @@ void drawCars(){
 	}
 }
 
-
-
 void displayObjects(){
 	glPushMatrix();
 			glColor3f(1,1,1);    
@@ -422,8 +421,6 @@ void displayObjects(){
 
 }
 
-
-
 void display(){
 	glClearColor (0.0,0.0,0.0,1.0); //clear the screen to black
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -432,7 +429,7 @@ void display(){
  
 	glPushMatrix();
 	init();
-	Interface * inter = new Interface(cam);
+	inter = new Interface(cam);
 	inter->draw();
 	cam->draw();
 	displayObjects();
@@ -533,39 +530,35 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0);
 }
 
-	void keyboardSpecial(int key, int x, int y){
-		if(cam->isFollowing()){
-			if (key==GLUT_KEY_UP)
-					cam->getFollowedCar()->setNextTurn(NORTH);
-			if (key==GLUT_KEY_LEFT)
-					cam->getFollowedCar()->setNextTurn(WEST);
-			if (key==GLUT_KEY_DOWN)
-					cam->getFollowedCar()->setNextTurn(SOUTH);
-			if (key==GLUT_KEY_RIGHT)
-					cam->getFollowedCar()->setNextTurn(EAST);
-		}
+void keyboardSpecial(int key, int x, int y){
+	if(cam->isFollowing()){
+		if (key==GLUT_KEY_UP)
+			cam->getFollowedCar()->setNextTurn(NORTH);
+		if (key==GLUT_KEY_LEFT)
+			cam->getFollowedCar()->setNextTurn(WEST);
+		if (key==GLUT_KEY_DOWN)
+			cam->getFollowedCar()->setNextTurn(SOUTH);
+		if (key==GLUT_KEY_RIGHT)
+			cam->getFollowedCar()->setNextTurn(EAST);
 	}
+}
 
 extern "C" {
 	FILE* _iob = NULL;
 }
 
- void mouseClick(int button, int state, int x, int y)
- {
-    if 	((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN))
-	{
+ void mouseClick(int button, int state, int x, int y){
+    if 	((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)){
 		mousedw(x, y, button);
 	}
  }
  
- void mousedw(int x, int y, int but)
- {
+ void mousedw(int x, int y, int but){
  	printf("Mouse button %d pressed at %d %d\n", but, x, y);
- 	gl_select(x,glutGet(GLUT_WINDOW_HEIGHT)-y); //Important: gl (0,0) ist bottom left but window coords (0,0) are top left so we have to change this!
+ 	glSelect(x,glutGet(GLUT_WINDOW_HEIGHT)-y); //Important: gl (0,0) ist bottom left but window coords (0,0) are top left so we have to change this!
  }
  
- void gl_select(int x, int y)
- {
+ void glSelect(int x, int y){
  	GLuint buff[64] = {0};
  	GLint hits, view[4];
  	int id;
@@ -612,11 +605,16 @@ extern "C" {
   //get clicked Car
   int clickedId = *ptr;
   cout<<clickedId<<endl;
+  if(clickedId >= 10){
   vector<Car*>::iterator it;
 	for(it = cars.begin(); it != cars.end(); it++){
 		if((*it)->id == clickedId)
 			cam->follow(*it);
 	}
+  }
+  else{
+	  inter->objectClicked(clickedId);
+  }
  
  	glMatrixMode(GL_MODELVIEW);
  }
