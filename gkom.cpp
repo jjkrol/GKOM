@@ -9,8 +9,8 @@
 	oœwietlenie (normalne, intensywnosc)
 	wiêcej pojazdów
 	height mapa
-	textury?
 	efekty?
+	Ÿle skrêca kiedy jedzie za szybko
 
 */
 
@@ -22,14 +22,14 @@ const int segmentSize = 10;
 const int roadWidth = 4;
 const int gridWidth = segmentSize + roadWidth;
 const int segmentCount = 7;
-float strength = 3;
-const int amountCars = 3;
+float strength = 1;;
+const int amountCars = 1;
 const int maxAmountInfo = 3;
 bool paused = true;
 
 const double floorHeight = 10;
 const int mapSize = 512;
-BYTE heightMap[mapSize*mapSize*3];
+UINT heightMap[mapSize*mapSize*3];
 LPVOID glutFonts[7] = { 
     GLUT_BITMAP_9_BY_15, 
     GLUT_BITMAP_8_BY_13, 
@@ -127,7 +127,7 @@ void generateRoads(){
 
 }
 
-float getHeight(BYTE *pHeightMap, int X, int Y) {
+float getHeight(UINT *pHeightMap, int X, int Y) {
     unsigned int x = X % mapSize;               
     unsigned int y = Y % mapSize;
  
@@ -145,7 +145,8 @@ void loadTextures(){
 	roadTexture[0] = ilutGLLoadImage("textures/road.jpg");
 	//Tex1 = ilutGLLoadImage("tex1.bmp");
 
-	loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
+	//loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
+	heightMap[0] = ilutGLLoadImage("textures/heightmap.jpg");
 	JPEG_Skybox(SkyboxTexture,"textures/front.jpg",  SKYFRONT);
 	JPEG_Skybox(SkyboxTexture,"textures/back.jpg",   SKYBACK);
 	JPEG_Skybox(SkyboxTexture,"textures/left.jpg",   SKYLEFT);
@@ -183,7 +184,7 @@ void init_objects(){
 //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
-void drawHeightmap(BYTE pHeightMap[]){
+void drawHeightmap(UINT pHeightMap[]){
 const int stepSize = 1;
 //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glTranslated(0,0,1);
@@ -238,38 +239,51 @@ glEnd();
 }
 
 void init(){
-GLuint filter;                      // Which Filter To Use
-GLuint fogMode[]= { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
-GLuint fogfilter= 0;                    // Which Fog To Use
-GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};      // Fog Color
+	   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+   GLfloat mat_shininess[] = { 50.0 };
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glShadeModel (GL_SMOOTH);
 
-glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
- 
-glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
-glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
-glFogf(GL_FOG_DENSITY, 0.01f);              // How Dense Will The Fog Be
-glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
-glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-//glEnable(GL_FOG);                   // Enables GL_FOG
+   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
-	GLfloat mat_ambient[]    = { 1.0, 1.0,  1.0, 1.0 };
-	GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
-
-	glMaterialfv( GL_FRONT, GL_AMBIENT, mat_ambient );
-	glMaterialfv( GL_FRONT, GL_SPECULAR, mat_specular );
-	glMaterialf( GL_FRONT, GL_SHININESS, 50.0 );
+   glEnable(GL_LIGHTING);
+   glEnable(GL_DEPTH_TEST);
+//GLuint filter;                      // Which Filter To Use
+//GLuint fogMode[]= { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
+//GLuint fogfilter= 0;                    // Which Fog To Use
+//GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};      // Fog Color
+//
+//glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+// 
+//glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+//glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+//glFogf(GL_FOG_DENSITY, 0.01f);              // How Dense Will The Fog Be
+//glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+//glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
+//glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
+////glEnable(GL_FOG);                   // Enables GL_FOG
+//
+//	GLfloat mat_ambient[]    = { 1.0, 1.0,  1.0, 1.0 };
+//	GLfloat mat_specular[]   = { 1.0, 1.0,  1.0, 1.0 };
+//
+//	glMaterialfv( GL_FRONT, GL_AMBIENT, mat_ambient );
+//	glMaterialfv( GL_FRONT, GL_SPECULAR, mat_specular );
+//	glMaterialf( GL_FRONT, GL_SHININESS, 50.0 );
 	glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
     glEnable ( GL_COLOR_MATERIAL ) ;
 	glShadeModel( GL_SMOOTH );
+//
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_BLEND);
+//
+//	glEnable( GL_NORMALIZE );
+//
+//	glClearDepth(1);
+//	//glDepthFunc( GL_LESS );
+//	glDepthFunc(GL_LEQUAL);
+//	glEnable( GL_DEPTH_TEST );
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-
-	glEnable( GL_NORMALIZE );
-
-	glDepthFunc( GL_LESS );
-	glEnable( GL_DEPTH_TEST );
 
 }
 
@@ -341,28 +355,18 @@ void drawSkybox(float x, float y, float z,
 
 void drawLightning(){
 
-	GLfloat global_ambient[]     = { 0.7, 0.7,  0.7, 1.0 };
-	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, global_ambient );
-	GLfloat light_position[] = {10, -10, 40, 1.0f};
 
-	GLfloat light0_ambient[] = {0.5f, 0.5f, 0.5f, 1.0f};
 	GLfloat light0_diffuse[] = {strength, strength, strength, 1.0f};	
-	GLfloat light0_specular[] = {1, 1, 1, 1.0f};
-	GLfloat light0_emission[] = {0, 0, 0, 1.0f};
-
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position );
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+
+	GLfloat light0_ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+	GLfloat light0_specular[] = {0.1, 0.1, 0.1};
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
-	GLfloat light1_position[] = {50, 50, 40, 1};
-	glLightfv(GL_LIGHT1, GL_POSITION, light1_position );
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light0_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light0_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light0_specular);
-
-
+	GLfloat light0_position[] = {-10, 50, 100, 1};
+	glLightfv(GL_LIGHT0, GL_POSITION, light0_position );
 	glEnable( GL_LIGHT0 );
-	glEnable( GL_LIGHT1 );
+
 	glEnable( GL_LIGHTING );
 
 }
@@ -624,15 +628,8 @@ void keyboard(unsigned char key, int x, int y)
 				cam->getFollowedCar()->toggleNextPoint();
 		
 	}
-	//	//isFollowing = true;
-	//	followingAngle = 0;
-	//	x = 0;
-	//	y = 0;
-	//	rotX = 0;
-	//	rotZ = 0;
-	//	rotY = 0;
-	//	//targetFollowed = getRandomCar();
-	//}
+	if(key == 'r')
+		cam->setDefaults();
 
 	//if (key==13){
 	//	//x -= (amountX/2)*sizeX -targetFollowed->x;
@@ -640,10 +637,11 @@ void keyboard(unsigned char key, int x, int y)
 	//	//isFollowing = false;
 	//}
 
-	//if (key=='+')
-	//	//Lightning::increaseLight();
-	//if (key=='-')
-	//	//Lightning::decreaseLight();
+	if (key=='+')
+		strength +=0.1;	
+	if (key=='-')
+		strength -=0.1;
+
     if (key==27)
 		exit(0);
 }

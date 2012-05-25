@@ -20,6 +20,14 @@ x(x), y(y), z(z),
 
 }
 
+void Camera::setDefaults(){
+	x = 30;
+	y = -30;
+	z = 40;
+	rotX = -60;
+	rotY = rotZ = 0;
+}
+
 void Camera::increaseAngle(double & angle){
 	angle += degreeDelta;
 	if(angle > 360) angle -= 360;

@@ -1,0 +1,35 @@
+﻿Build started 2012-05-25 17:52:48.
+     1>Project "C:\Users\jjkrol\Documents\My Dropbox\Studia\GKOM\kod\jjkrol_gkom\gkom\gkom\gkom.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Release\gkom.unsuccessfulbuild".
+       ClCompile:
+         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\Users\jjkrol\Documents\My Dropbox\Studia\GKOM\kod\jjkrol_gkom\gkom\gkom" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Release\gkom.pch" /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\Users\jjkrol\Documents\My Dropbox\Studia\GKOM\kod\jjkrol_gkom\gkom\gkom" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Release\gkom.pch" /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Arrow.cpp Building.cpp camera.cpp Car.cpp gkom.cpp jpeg.cpp road.cpp
+         Arrow.cpp
+         Building.cpp
+         camera.cpp
+         Car.cpp
+         gkom.cpp
+     1>gkom.cpp(144): error C2664: 'ilutGLLoadImage' : cannot convert parameter 1 from 'const char [22]' to 'wchar_t *'
+                 Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+     1>gkom.cpp(145): error C2664: 'ilutGLLoadImage' : cannot convert parameter 1 from 'const char [18]' to 'wchar_t *'
+                 Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+     1>gkom.cpp(146): error C2664: 'ilutGLLoadImage' : cannot convert parameter 1 from 'const char [18]' to 'wchar_t *'
+                 Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+     1>gkom.cpp(150): error C2664: 'ilutGLLoadImage' : cannot convert parameter 1 from 'const char [23]' to 'wchar_t *'
+                 Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+     1>gkom.cpp(526): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\string.h(105) : see declaration of 'strcpy'
+     1>gkom.cpp(763): warning C4018: '<' : signed/unsigned mismatch
+         jpeg.cpp
+     1>jpeg.cpp(72): error C2664: 'auxDIBImageLoadW' : cannot convert parameter 1 from 'LPSTR' to 'LPCWSTR'
+                 Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+         road.cpp
+     1>road.cpp(21): warning C4800: 'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>Done Building Project "C:\Users\jjkrol\Documents\My Dropbox\Studia\GKOM\kod\jjkrol_gkom\gkom\gkom\gkom.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:06.02

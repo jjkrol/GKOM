@@ -63,7 +63,6 @@ void loadHeightMap(BYTE *map, int size, LPSTR fileName){
 tImageJPG * amap = Load_JPEG(fileName);
 if(amap == NULL)	exit(0);
 memcpy(map, amap->data, size*size*3);
-	//displayMemory((char*)amap->data, size*size*9); //display 100 bytes of code from main().
 }
 
 void BMP_Texture(UINT textureArray[], LPSTR strFileName, int ID)

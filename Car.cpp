@@ -6,7 +6,7 @@ void Car::setNewTarget(){
 	targetVertex = road->getRandomVertex();
 	arr->setTarget(targetVertex);
 }
-Car::Car(Road * road, int id):road(road),id(id),ep(0.01),
+Car::Car(Road * road, int id):road(road),id(id),ep(0.01),baseEp(0.01),
 	height(1.5), speed(0.05), turning(true), showArrow(true),
 showNextPoint(true), nextTurn(NONE), rotX(90), rotY(0), rotZ(0){
 	arr = new Arrow();
@@ -74,7 +74,7 @@ Direction Car::getNextTurn(){
 }
 void Car::move(){
 	double eps = speed*2;
-
+	ep = baseEp * speed/0.05;
 	if(	abs(targetVertex->x-x) < road->width &&
 		abs(targetVertex->y-y) < road->width &&
 		abs(targetVertex->z-z) < road->width){
@@ -105,24 +105,11 @@ void Car::move(){
 		}
 		else{
 			enum Turn {RIGHT, LEFT, STRAIGHT};
-			//get riding direction
 			Direction ridingDir;
 			Turn ridingTurn;
 			calculateDirection(ridingDir);
 
-			Vertex * temp = nextVertex;
-			bool possibleDirections[4];
-
-			nextVertex->getNeighboursDirections(possibleDirections);
-			if(nextTurn != NONE && possibleDirections[nextTurn]){
-				nextVertex = nextVertex->getNeighbourByDirection(nextTurn);
-				nextTurn = NONE;
-			}
-			else{
-				nextVertex = nextVertex->getRandomNeighbour(currentVertex);
-			}
-
-			currentVertex = temp;
+			chooseNextVertex();
 			currentVertex->getNeighbourPeriphery(nextVertex, target, road->width/2);
 			calculateDirection(currentDirection);
 
@@ -255,8 +242,9 @@ double Car::getRotZ(){
 }
 void Car::draw(){
 	glPushMatrix();
+	//draw target
 	glPushMatrix();
-		glTranslated(targetVertex->x, targetVertex->y, targetVertex->z+4);
+		glTranslated(targetVertex->x, targetVertex->y, targetVertex->z+1);
 		glColor3f(0,1,0);
 		glutSolidCube(2);
 	glPopMatrix();
@@ -267,7 +255,7 @@ void Car::draw(){
 
 	if(showArrow){
 		arr->draw(x,y,z);
-}
+	}
 	glLoadName(id);
 	glRotated(rotZ, 0, 0, 1);
 	glRotated(rotY, 0, 1, 0);
@@ -281,7 +269,7 @@ void Car::calculateDirection(Direction & dir){
 	double directions[2] = {
 	nextVertex->x - currentVertex->x,
 	nextVertex->y - currentVertex->y};
-			if(abs(directions[0]) > ep)
+			if(abs(directions[0]) > ep * speed/0.05)
 				if(directions[0] > 0)
 					dir = EAST;
 				else
@@ -291,4 +279,19 @@ void Car::calculateDirection(Direction & dir){
 					dir = NORTH;
 				else
 					dir = SOUTH;
+}
+
+void Car::chooseNextVertex(){
+			Vertex * temp = nextVertex;
+			bool possibleDirections[4];
+			nextVertex->getNeighboursDirections(possibleDirections);
+			if(nextTurn != NONE && possibleDirections[nextTurn]){
+				nextVertex = nextVertex->getNeighbourByDirection(nextTurn);
+				nextTurn = NONE;
+			}
+			else{
+				nextVertex = nextVertex->getRandomNeighbour(currentVertex);
+			}
+			currentVertex = temp;
+
 }

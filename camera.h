@@ -39,6 +39,7 @@ public:
 	void rotZcw(){decreaseAngle(rotZ);}
 	void followRotZccw(){increaseAngle(followRotZ);}
 	void followRotZcw(){decreaseAngle(followRotZ);}
+	void setDefaults();
 
 	Car * getFollowedCar(){return followedCar; }
 

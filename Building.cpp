@@ -49,21 +49,22 @@ void Building::draw(){
 
 	float normalizer = 6;
 	//walls
+	const int numberOfTiles = 10;
   for (i = 3; i >= 0; i--) {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);  
-    glBegin(GL_QUADS);
-    glNormal3fv(&n[i][0]);
-	glTexCoord2f(0.0f, 0.0f);
-    glVertex3fv(&v[faces[i][0]][0]);
-	 glTexCoord2f(0.0f, 1.0f*(float)height/normalizer);
-    glVertex3fv(&v[faces[i][1]][0]);
-	 glTexCoord2f(1.0f*(float)size/normalizer, 1.0f*(float)height/normalizer);
-    glVertex3fv(&v[faces[i][2]][0]);
-	 glTexCoord2f(1.0f*(float)size/normalizer, 0.0f);
-    glVertex3fv(&v[faces[i][3]][0]);
-    glEnd();
-	glDisable(GL_TEXTURE_2D);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, texture[0]);  
+			glBegin(GL_QUADS);
+			glNormal3fv(&n[i][0]);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex3fv(&v[faces[i][0]][0]);
+			 glTexCoord2f(0.0f, 1.0f*(float)height/normalizer);
+			glVertex3fv(&v[faces[i][1]][0]);
+			 glTexCoord2f(1.0f*(float)size/normalizer, 1.0f*(float)height/normalizer);
+			glVertex3fv(&v[faces[i][2]][0]);
+			 glTexCoord2f(1.0f*(float)size/normalizer, 0.0f);
+			glVertex3fv(&v[faces[i][3]][0]);
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
   }
 //roof
 	glEnable(GL_TEXTURE_2D);

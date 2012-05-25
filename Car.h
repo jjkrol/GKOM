@@ -25,6 +25,7 @@ public:
 	void getPossibleDirections(bool * table);
 	void setNextTurn(Direction dir);
 	void setNewTarget();
+	Arrow * getArrow(){return arr;}
 	Direction getNextTurn();
 	double getRotY();
 	double getRotZ();
@@ -50,6 +51,8 @@ private:
 	bool showNextPoint;
 	Road * road;
 	void calculateDirection(Direction & dir);
-	const double ep;
+	void chooseNextVertex();
+	const double baseEp;
+	double ep;
 };
 
