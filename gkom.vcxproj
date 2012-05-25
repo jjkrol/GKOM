@@ -84,26 +84,30 @@
     <ClInclude Include="Building.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Car.h" />
+    <ClInclude Include="Edge.h" />
     <ClInclude Include="gkom.h" />
     <ClInclude Include="glIncl.h" />
     <ClInclude Include="JPEG.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="road.h" />
+    <ClInclude Include="Road.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Building.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Car.cpp" />
+    <ClCompile Include="Edge.cpp" />
     <ClCompile Include="gkom.cpp" />
     <ClCompile Include="jpeg.cpp" />
-    <ClCompile Include="road.cpp" />
+    <ClCompile Include="Road.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

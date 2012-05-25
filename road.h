@@ -4,42 +4,11 @@
 #include <iostream>
 #include <iterator>
 #include "glIncl.h"
+#include "Vertex.h"
+#include "Edge.h"
 
-			enum Direction {NORTH, WEST, SOUTH, EAST, NONE};
-class Vertex{
-public:
-	const double x;
-	const double y;
-	const double z;
-	Vertex(double x, double y, double z);
-	void registerNeighbour(Vertex * v);
-	void printVertex() const;
-	Vertex * getRandomNeighbour(Vertex * omit);
-	Vertex * getNeighbourByDirection(Direction dir);
-	void printNeighbours() const;
-	void getNeighbourPeriphery(Vertex * v, double coords[3], double eps);
-	bool hasNeighbour(Direction dir);
-	bool canBeRegistered(Vertex * v);
-	void getNeighboursDirections(bool * table);
-	Direction getNeighbourLocation(Vertex * v);
-	std::map<Direction, Vertex*> getNeighboursMap();
-	
-private:
-	std::set<Vertex*> neighbours;
-	std::map<Direction, Vertex*> neighboursMap;
-};
-
-
-
-class Edge{
-public:
-	const Vertex * v1;
-	const Vertex * v2;
-	Edge(Vertex * v1, Vertex * v2);
-
-};
-
-
+class Vertex;
+class Edge;
 
 class Road
 {
