@@ -101,8 +101,8 @@ v1(v1),v2(v2){
 	v2->registerNeighbour(v1);
 }
 
-Road::Road(float width):width(width)
-{
+Road::Road(float width, UINT * roadTexture):
+width(width),texture(roadTexture){
 	segmentSize = 10;
 	floorHeight = 10;
 }
@@ -211,14 +211,20 @@ void Road::draw(){
 		double x = v->x;
 		double y = v->y;
 		double z = v->z;
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);  
 		glColor3f(0.5f,0.5f,1.0f); 
 		glBegin(GL_QUADS);		
-//			glTexCoord2f(0.0f, 0.0f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(x-d, y+d, z);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(x+d, y+d, z);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(x+d, y-d, z);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(x-d, y-d, z);
 		glEnd();
+	glDisable(GL_TEXTURE_2D);
 	}
 
 	//draw connections
@@ -229,7 +235,7 @@ void Road::draw(){
 		double	x1=0,x2=0,x3=0,x4=0,
 				y1=0,y2=0,y3=0,y4=0,
 				z1=0,z2=0,z3=0,z4=0;
-
+		float width, length, ratio;
 		if(v1->x == v2->x){ //along y axis
 		x1 = v1->x-d; //top left
 		x2 = v1->x+d; //top right
@@ -246,6 +252,8 @@ void Road::draw(){
 				y1 = y2 += d;
 				y3 = y4 -= d;
 			}
+			width = abs(x1-x2);
+			length = abs(y1-y3);
 		}
 
 		if(v1->y == v2->y){ //along x axis
@@ -264,19 +272,27 @@ void Road::draw(){
 				x1 = x2 += d;
 				x3 = x4 -= d;
 			}
+			width = abs(y1-y2);
+			length = abs(x1-x3);
 		}
 
 		z1 = z2 = v1->z;
 		z3 = z4 = v2->z;
-		
+	ratio = length/width;	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);  
 		glColor3f(0.5f,0.5f,1.0f);    
 		glBegin(GL_QUADS);		
-//			glTexCoord2f(0.0f, 0.0f);
+			glTexCoord2f(0.0f, 1.0f*ratio);
 			glVertex3f(x1,y1,z1);
+			glTexCoord2f(1.0f, 1.0f*ratio);
 			glVertex3f(x2,y2,z2);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(x3,y3,z3);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(x4,y4,z4);
 		glEnd();
+	glDisable(GL_TEXTURE_2D);
 	}
 }
 

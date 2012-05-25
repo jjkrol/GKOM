@@ -2,11 +2,12 @@
 #include "Building.h"
 
 
-Building::Building(double size, double height):size(size), height(height){
+Building::Building(double size, double height, UINT * buildingTexture):
+size(size), height(height){
+	texture = buildingTexture;
 	red = (double)rand()/(double)RAND_MAX;
 	green = (double)rand()/(double)RAND_MAX;
 	blue = (double)rand()/(double)RAND_MAX;
-	//JPEG_Texture(texture,"textures/highrise.jpg",  0);
 
 }
 
@@ -46,21 +47,39 @@ void Building::draw(){
   v[0][2] = v[3][2] = v[4][2] = v[7][2] = -height/2;
   v[1][2] = v[2][2] = v[5][2] = v[6][2] = height/2;
 
-  for (i = 5; i >= 0; i--) {
-
-	//glBindTexture(GL_TEXTURE_2D, texture[0]);  
+	float normalizer = 6;
+	//walls
+  for (i = 3; i >= 0; i--) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);  
     glBegin(GL_QUADS);
     glNormal3fv(&n[i][0]);
 	glTexCoord2f(0.0f, 0.0f);
     glVertex3fv(&v[faces[i][0]][0]);
-	 glTexCoord2f(0.0f, 1.0f);
+	 glTexCoord2f(0.0f, 1.0f*(float)height/normalizer);
     glVertex3fv(&v[faces[i][1]][0]);
-	 glTexCoord2f(1.0f, 1.0f);
+	 glTexCoord2f(1.0f*(float)size/normalizer, 1.0f*(float)height/normalizer);
     glVertex3fv(&v[faces[i][2]][0]);
-	 glTexCoord2f(1.0f, 0.0f);
+	 glTexCoord2f(1.0f*(float)size/normalizer, 0.0f);
     glVertex3fv(&v[faces[i][3]][0]);
     glEnd();
+	glDisable(GL_TEXTURE_2D);
   }
+//roof
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);  
+    glBegin(GL_QUADS);
+    glNormal3fv(&n[4][0]);
+	glTexCoord2f(0.0f, 0.0f);
+    glVertex3fv(&v[faces[4][0]][0]);//lewy dolny
+	 glTexCoord2f(0.0f, 1.0f*(float)height/normalizer);
+    glVertex3fv(&v[faces[4][1]][0]);//lewy gorny
+	 glTexCoord2f(1.0f*(float)size/normalizer, 1.0f*(float)height/normalizer);
+    glVertex3fv(&v[faces[4][2]][0]);//prawy gorny
+	 glTexCoord2f(1.0f*(float)size/normalizer, 0.0f);
+    glVertex3fv(&v[faces[4][3]][0]);//prawy dolny
+    glEnd();
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }

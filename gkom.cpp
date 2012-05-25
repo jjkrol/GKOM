@@ -6,7 +6,8 @@
 /*
 	skrêcanie pod górê (p³ynne)
 	czajnik na samochód
-	oœwietlenie
+	oœwietlenie (normalne, intensywnosc)
+	wiêcej pojazdów
 	height mapa
 	textury?
 	efekty?
@@ -22,7 +23,7 @@ const int roadWidth = 4;
 const int gridWidth = segmentSize + roadWidth;
 const int segmentCount = 7;
 float strength = 3;
-const int amountCars = 8;
+const int amountCars = 3;
 const int maxAmountInfo = 3;
 bool paused = true;
 
@@ -45,6 +46,8 @@ Camera* cam;
 Road * mainRoad;
 UINT SkyboxTexture[6];	
 UINT TextureArray[1];
+UINT buildingTexture[2];
+UINT roadTexture[1];
  
  int selected = 0;
  
@@ -59,13 +62,15 @@ void generateBuildings(){
 	for(int i = 0; i < segmentCount; i++)
 		for(int j = 0; j < segmentCount; j++){
 			buildings[i][j] = new Building(segmentSize,
-				floorHeight + rand() % int(floorHeight*4));
+				floorHeight + rand() % int(floorHeight*4),
+				//10,
+				buildingTexture);
 		}
 }
 
 void generateRoads(){
 	//roads
-	mainRoad = new Road(roadWidth);
+	mainRoad = new Road(roadWidth, roadTexture);
 	mainRoad->addPart(0,0,0,0,1,0);	
 	mainRoad->addPart(0,1,0,0,3,0);	
 	mainRoad->addPart(0,1,0,2,1,0);
@@ -133,9 +138,27 @@ float getHeight(BYTE *pHeightMap, int X, int Y) {
     float height = (red+green+blue)/3.0f;
 	return height;
 }
+void loadTextures(){
+	//JPEG_Texture(buildingTexture,"textures/highrise.jpg",  0);
+	buildingTexture[0] = ilutGLLoadImage("textures/highrise.jpg");
+	buildingTexture[1] = ilutGLLoadImage("textures/roof.jpg");
+	roadTexture[0] = ilutGLLoadImage("textures/road.jpg");
+	//Tex1 = ilutGLLoadImage("tex1.bmp");
 
+	loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
+	JPEG_Skybox(SkyboxTexture,"textures/front.jpg",  SKYFRONT);
+	JPEG_Skybox(SkyboxTexture,"textures/back.jpg",   SKYBACK);
+	JPEG_Skybox(SkyboxTexture,"textures/left.jpg",   SKYLEFT);
+	JPEG_Skybox(SkyboxTexture,"textures/right.jpg",  SKYRIGHT);
+	JPEG_Skybox(SkyboxTexture,"textures/up.jpg",     SKYUP);
+	JPEG_Skybox(SkyboxTexture,"textures/down.jpg",   SKYDOWN);
+}
 void init_objects(){
+	  ilInit();
+       iluInit();
+        ilutRenderer(ILUT_OPENGL);
 	cam = new Camera(30,-30,40,-60,0,0);
+	loadTextures();
 	/*Floor::initTextures();
 	BuildingObject::initTexture();
 	GroundFloor::generateGroundFloor();
@@ -153,20 +176,11 @@ void init_objects(){
 //	cars.push_back(new Car(mainRoad, 2));
 	//textures
 
-	glEnable(GL_TEXTURE_2D);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
-	//cout<<"Height: "<<getHeight(heightMap, 20, 20)<<endl;
-	JPEG_Skybox(SkyboxTexture,"textures/front.jpg",  SKYFRONT);
-	JPEG_Skybox(SkyboxTexture,"textures/back.jpg",   SKYBACK);
-	JPEG_Skybox(SkyboxTexture,"textures/left.jpg",   SKYLEFT);
-	JPEG_Skybox(SkyboxTexture,"textures/right.jpg",  SKYRIGHT);
-	JPEG_Skybox(SkyboxTexture,"textures/up.jpg",     SKYUP);
-	JPEG_Skybox(SkyboxTexture,"textures/down.jpg",   SKYDOWN);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
 void drawHeightmap(BYTE pHeightMap[]){
@@ -266,6 +280,7 @@ void drawSkybox(float x, float y, float z,
 	y = y - length/4;
 	z = z;
 
+	glEnable(GL_TEXTURE_2D);
 	// Draw Back side
 	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYBACK]);
 	glBegin(GL_QUADS);	
@@ -319,6 +334,8 @@ void drawSkybox(float x, float y, float z,
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+length,		z); 
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y,		z);
 	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 
 }
 
