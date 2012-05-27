@@ -28,28 +28,25 @@ const int maxAmountInfo = 3;
 bool paused = true;
 
 const double floorHeight = 10;
-const int mapSize = 512;
-UINT heightMap[mapSize*mapSize*3];
+//UINT heightMap[mapSize*mapSize*3];
 Interface * inter;
 
 Building * buildings[segmentCount][segmentCount];
-
 vector<Car*> cars;
 Camera* cam;
 Road * mainRoad;
-UINT SkyboxTexture[6];	
+Heightmap * hmap;
+UINT skyboxTexture[6];	
 UINT TextureArray[1];
 UINT buildingTexture[2];
 UINT roadTexture[1];
- 
+
  int selected = 0;
  
  void glSelect(int x, int y);
- void gl_selall(GLint hits, GLuint *buff);
  void mouseClick();
  void mousedw(int x, int y, int but);
  void draw_block(float x, float y, float z);
- void list_hits(GLint hits, GLuint *names);
 
 void generateBuildings(){
 	for(int i = 0; i < segmentCount; i++)
@@ -120,38 +117,59 @@ void generateRoads(){
 
 }
 
-float getHeight(UINT *pHeightMap, int X, int Y) {
-    unsigned int x = X % mapSize;               
-    unsigned int y = Y % mapSize;
- 
-    if(!pHeightMap) return 0;
-	float red = pHeightMap[(x+(y*mapSize))*3];   
-	float green = pHeightMap[(x+(y*mapSize))*3+1];   
-	float blue = pHeightMap[(x+(y*mapSize))*3+2];   
-    float height = (red+green+blue)/3.0f;
-	return height;
+string getSkyboxPath(int num){
+	string dir = "textures/", prefix = "default_", filetype = ".jpg";
+	string name;
+	switch(num){
+	case SKYFRONT:
+		name = "front";
+		break;
+	case SKYBACK:
+		name = "back";
+		break;
+	case SKYLEFT:
+		name = "left";
+		break;
+	case SKYRIGHT:
+		name = "right";
+		break;
+	case SKYUP:
+		name = "up";
+		break;
+	case SKYDOWN:
+		name = "down";
+		break;
+	}
+	return dir+prefix+name+filetype;
 }
+
 void loadTextures(){
-	//JPEG_Texture(buildingTexture,"textures/highrise.jpg",  0);
+
+	hmap->load();
+	hmap->setTexture("textures/terrain.jpg");
+
+	ilInit();
+    iluInit();
+    ilutRenderer(ILUT_OPENGL);
 	buildingTexture[0] = ilutGLLoadImage("textures/highrise.jpg");
 	buildingTexture[1] = ilutGLLoadImage("textures/roof.jpg");
 	roadTexture[0] = ilutGLLoadImage("textures/road.jpg");
+	
 	//Tex1 = ilutGLLoadImage("tex1.bmp");
-
 	//loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
-	heightMap[0] = ilutGLLoadImage("textures/heightmap.jpg");
-	JPEG_Skybox(SkyboxTexture,"textures/front.jpg",  SKYFRONT);
-	JPEG_Skybox(SkyboxTexture,"textures/back.jpg",   SKYBACK);
-	JPEG_Skybox(SkyboxTexture,"textures/left.jpg",   SKYLEFT);
-	JPEG_Skybox(SkyboxTexture,"textures/right.jpg",  SKYRIGHT);
-	JPEG_Skybox(SkyboxTexture,"textures/up.jpg",     SKYUP);
-	JPEG_Skybox(SkyboxTexture,"textures/down.jpg",   SKYDOWN);
+	//load vertices
+	
+	skyboxTexture[SKYFRONT] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYFRONT).c_str()));
+	skyboxTexture[SKYBACK] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYBACK).c_str()));
+	skyboxTexture[SKYLEFT] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYLEFT).c_str()));
+	skyboxTexture[SKYRIGHT] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYRIGHT).c_str()));
+	skyboxTexture[SKYUP] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYUP).c_str()));
+	//	textureArray[] = ilutGLLoadImage(const_cast<char *>(getSkyboxPath(SKYDOWN).c_str()),   SKYDOWN);
 }
+
 void init_objects(){
-	  ilInit();
-       iluInit();
-        ilutRenderer(ILUT_OPENGL);
 	cam = new Camera(30,-30,40,-60,0,0);
+	hmap = new Heightmap(1024, 4, 0.3, "textures/heightmap.jpg");
 	loadTextures();
 	/*Floor::initTextures();
 	BuildingObject::initTexture();
@@ -175,60 +193,6 @@ void init_objects(){
 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-}
-
-void drawHeightmap(UINT pHeightMap[]){
-const int stepSize = 1;
-//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glTranslated(0,0,1);
-    int i = 0, j = 0;
-    float x, y, z;                        // Create Some Variables For Readability
-	float normalizer = 10;
-    if(!pHeightMap) return;                 // Make Sure Our Height Data Is Valid
-	glBegin( GL_QUADS ); 
-	for ( i = 0; i < (mapSize-stepSize); i += stepSize )
-    for ( j = 0; j < (mapSize-stepSize); j += stepSize )
-    {
-        // Get The (X, Y, Z) Value For The Bottom Left Vertex
-        x = i;                         
-        y = j;                         
-        z = (float)getHeight(pHeightMap, i, j )/normalizer; 
- //       SetVertexColor(pHeightMap, x, z);
- 
-        glVertex3f(x, y, z);            // Send This Vertex To OpenGL To Be Rendered
-		//cout<<z<<" ";
-        // Get The (X, Y, Z) Value For The Top Left Vertex
-        x = i;                                     
-        z = (float)getHeight(pHeightMap, i, j + stepSize )/normalizer; 
-        y = j + stepSize ;                        
-         
-        // Set The Color Value Of The Current Vertex
-  //      SetVertexColor(pHeightMap, x, z);
- 
-        glVertex3f(x, y, z);            // Send This Vertex To OpenGL To Be Rendered
- 
-        // Get The (X, Y, Z) Value For The Top Right Vertex
-        x = i + stepSize;
-        z = (float)getHeight(pHeightMap, i + stepSize, j + stepSize )/normalizer;
-        y = j + stepSize ;
- 
-        // Set The Color Value Of The Current Vertex
-        //SetVertexColor(pHeightMap, x, z);
-         
-        glVertex3f(x, y, z);            // Send This Vertex To OpenGL To Be Rendered
- 
-        // Get The (X, Y, Z) Value For The Bottom Right Vertex
-        x = i + stepSize;
-        z = (float) getHeight(pHeightMap, i + stepSize, j )/normalizer;
-        y = j;
- 
-        // Set The Color Value Of The Current Vertex
-        //SetVertexColor(pHeightMap, x, z);
- 
-        glVertex3f(x, y, z);            // Send This Vertex To OpenGL To Be Rendered
-    }
-glEnd();
- glColor4f(1.0f, 1.0f, 1.0f, 1.0f);          // Reset The Color
 }
 
 void init(){
@@ -289,57 +253,57 @@ void drawSkybox(float x, float y, float z,
 
 	glEnable(GL_TEXTURE_2D);
 	// Draw Back side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYBACK]);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYBACK]);
 	glBegin(GL_QUADS);	
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y+length,		z);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+length, z+height);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y+length, z+height); 
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y+length,		z);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y+length,		z);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+length, z+height);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+length, z+height); 
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y+length,		z);
 	glEnd();
 
 	// Draw Front side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYFRONT]);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYFRONT]);
 	glBegin(GL_QUADS);		
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y,		z);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y,    z+height); 
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y,	z+height);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y,		z);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y,    z+height); 
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y,	z+height);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z);
 	glEnd();
 
 	// Draw Left side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYLEFT]);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYLEFT]);
 	glBegin(GL_QUADS);		
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y,	z+height);	
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+length,	z+height); 
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y+length,		z);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z);		
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y,	z+height);	
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+length,	z+height); 
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y+length,		z);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z);		
 	glEnd();
 
 	// Draw Right side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYRIGHT]);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYRIGHT]);
 	glBegin(GL_QUADS);		
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y,		z);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y+length,		z);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+length,	z+height); 
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y,	z+height);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y,		z);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y+length,		z);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y+length,	z+height); 
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y,	z+height);
 	glEnd();
 
 	// Draw Up side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYUP]);
-	glBegin(GL_QUADS);		
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y, z+height);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y+length, z+height); 
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+length,	z+height);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y,	z+height);
-	glEnd();
+	//glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYUP]);
+	//glBegin(GL_QUADS);		
+	//glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y, z+height);
+	//glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y+length, z+height); 
+	//glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+length,	z+height);
+	//glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y,	z+height);
+	//glEnd();
 
 	// Draw Down side
-	glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYDOWN]);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture[SKYDOWN]);
 	glBegin(GL_QUADS);		
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y+length,		z);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+length,		z); 
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y,		z);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y+length,		z);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y+length,		z); 
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y,		z);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
@@ -408,7 +372,7 @@ void displayObjects(){
 			floorHeight*10 ,
 			gridWidth*segmentCount*4);
 		drawLightning();
-		//drawHeightmap(heightMap);
+		hmap->draw();
 	glPushMatrix();
 
 	glPopMatrix();

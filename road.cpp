@@ -68,11 +68,12 @@ void Road::addPart(int x1, int y1, int z1, int x2, int y2, int z2){
 void Road::addUnitPart(int x1, int y1, int z1, int x2, int y2, int z2){
 	Vertex * v1 = NULL;
 	Vertex * v2 = NULL;
+	const float firstFloorHeight = 2;
 	set<Vertex*>::iterator it;
 	double f = segmentSize+width; //factor
 	double
-		dx1=x1*f+width/2, dy1=y1*f+width/2, dz1=z1*floorHeight +0.01,
-		dx2=x2*f+width/2, dy2=y2*f+width/2, dz2=z2*floorHeight +0.01;
+		dx1=x1*f+width/2, dy1=y1*f+width/2, dz1=z1*floorHeight +firstFloorHeight,
+		dx2=x2*f+width/2, dy2=y2*f+width/2, dz2=z2*floorHeight +firstFloorHeight;
 	
 	//find if any of the vertices is already in the road
 	for(it = vertices.begin(); it!=vertices.end(); it++){

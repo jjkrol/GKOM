@@ -25,7 +25,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -74,6 +74,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\jjkrol\Documents\My Dropbox\Studia\GKOM\kod\jjkrol_gkom\gkom\gkom\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libc.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -87,6 +89,7 @@
     <ClInclude Include="Edge.h" />
     <ClInclude Include="gkom.h" />
     <ClInclude Include="glIncl.h" />
+    <ClInclude Include="Heightmap.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="JPEG.h" />
     <ClInclude Include="Main.h" />
@@ -102,6 +105,7 @@
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="gkom.cpp" />
+    <ClCompile Include="Heightmap.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="jpeg.cpp" />
     <ClCompile Include="Road.cpp" />

@@ -41,30 +41,6 @@ void displayMemory(char *address, int length) {
 }
 
 
-void loadHeightMap(BYTE *map, int size, LPSTR fileName){
-	if(!fileName)	return;
-	 //FILE *pFile = NULL;
- 
-  //  // Open The File In Read / Binary Mode.
-  //  pFile = fopen( fileName, "rb" );
- 
-  //  if ( pFile == NULL )   
-  //  {
-  //      return;
-  //  }
-  //  fread( map, 1, size, pFile );
- 
-  //  if (ferror( pFile )) {
-		//std::cout<<"Error reading heightmap"<<std::endl;
-  //  }
- 
-  //  fclose(pFile);
-	
-tImageJPG * amap = Load_JPEG(fileName);
-if(amap == NULL)	exit(0);
-memcpy(map, amap->data, size*size*3);
-}
-
 void BMP_Texture(UINT textureArray[], LPSTR strFileName, int ID)
 {
 	if(!strFileName)   return;
@@ -94,24 +70,23 @@ void JPEG_Skybox(UINT textureArray[], LPSTR strFileName, int ID)
 {
 	if(!strFileName)	return;
 	
-	tImageJPG *pBitMap = Load_JPEG(strFileName);
 	
-	if(pBitMap == NULL)	exit(0);
+	textureArray[ID] = ilutGLLoadImage(strFileName);
 	
-	glGenTextures(1, &textureArray[ID]);
-	glBindTexture(GL_TEXTURE_2D, textureArray[ID]);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, pBitMap->sizeX, pBitMap->sizeY, GL_RGB, GL_UNSIGNED_BYTE, pBitMap->data);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);	
+	//glGenTextures(1, &textureArray[ID]);
+	//glBindTexture(GL_TEXTURE_2D, textureArray[ID]);
+	//gluBuild2DMipmaps(GL_TEXTURE_2D, 3, pBitMap->sizeX, pBitMap->sizeY, GL_RGB, GL_UNSIGNED_BYTE, pBitMap->data);
+	//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);	
 
-	if (pBitMap)									
-	{
-		if (pBitMap->data)					
-		{
-			free(pBitMap->data);			
-		}
-		free(pBitMap);
-	}
+	//if (pBitMap)									
+	//{
+	//	if (pBitMap->data)					
+	//	{
+	//		free(pBitMap->data);			
+	//	}
+	//	free(pBitMap);
+	//}
 }
 
 void JPEG_Texture(UINT textureArray[], LPSTR strFileName, int ID)
