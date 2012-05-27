@@ -18,8 +18,8 @@ public:
 	void getCameraCoords(double coords[3]);
 	void getVelocityVector(double vel[3]);
 	Direction getCurrentDirection(){return currentDirection;};
-	void faster(){speed += 0.01; if(speed > 0.4) speed = 0.4;}
-	void slower(){speed -= 0.01; if(speed < 0) speed = 0;}
+	void faster(){if(turning) return; speed += 0.01; if(speed > 0.4) speed = 0.4;}
+	void slower(){if(turning) return; speed -= 0.01; if(speed < 0) speed = 0;}
 	void toggleArrow(){showArrow = !showArrow;}
 	bool isShowArrow(){return showArrow;}
 	void toggleNextPoint(){showNextPoint= !showNextPoint;}

@@ -6,9 +6,7 @@
 /*
 	skrêcanie pod górê (p³ynne)
 	czajnik na samochód
-	oœwietlenie (normalne, intensywnosc)
 	wiêcej pojazdów
-	height mapa
 	efekty?
 	Ÿle skrêca kiedy jedzie za szybko
 	enum do obiektow w interfejsie
@@ -39,7 +37,6 @@ Heightmap * hmap;
 UINT skyboxTexture[6];	
 UINT TextureArray[1];
 UINT buildingTexture[2];
-UINT roadTexture[1];
 
  int selected = 0;
  
@@ -60,7 +57,6 @@ void generateBuildings(){
 
 void generateRoads(){
 	//roads
-	mainRoad = new Road(roadWidth, roadTexture);
 	mainRoad->addPart(0,0,0,0,1,0);	
 	mainRoad->addPart(0,1,0,0,3,0);	
 	mainRoad->addPart(0,1,0,2,1,0);
@@ -100,16 +96,23 @@ void generateRoads(){
 
 	//third
 	mainRoad->addPart(3,5,2,4,5,2);
-	mainRoad->addPart(4,5,2,4,3,2);
-	mainRoad->addPart(4,3,2,5,3,2);
+	mainRoad->addPart(4,5,2,4,2,2);
+	mainRoad->addPart(4,2,2,5,2,2);
+	mainRoad->addPart(5,2,2,5,3,2);
+	mainRoad->addPart(2,4,2,2,2,2);
+	mainRoad->addPart(2,2,2,5,2,2);
+
 
 	//third to fourth
 	mainRoad->addPart(5,3,2,5,4,3);
 	mainRoad->addPart(4,5,3,3,5,2);
+	mainRoad->addPart(3,4,3,2,4,2);
 
 	//fourth
 	mainRoad->addPart(5,4,3,4,4,3);
 	mainRoad->addPart(4,4,3,4,5,3);
+	mainRoad->addPart(4,4,3,3,4,3);
+
 
 	//fourt to fifth
 	mainRoad->addPart(5,4,3,5,5,4);
@@ -153,7 +156,6 @@ void loadTextures(){
     ilutRenderer(ILUT_OPENGL);
 	buildingTexture[0] = ilutGLLoadImage("textures/highrise.jpg");
 	buildingTexture[1] = ilutGLLoadImage("textures/roof.jpg");
-	roadTexture[0] = ilutGLLoadImage("textures/road.jpg");
 	
 	//Tex1 = ilutGLLoadImage("tex1.bmp");
 	//loadHeightMap(heightMap, mapSize, "textures/heightmap.jpg");
@@ -169,7 +171,8 @@ void loadTextures(){
 
 void init_objects(){
 	cam = new Camera(30,-30,40,-60,0,0);
-	hmap = new Heightmap(1024, 4, 0.3, "textures/heightmap.jpg");
+	hmap = new Heightmap(1024, 8, 0.3, "textures/heightmap.jpg");
+	mainRoad = new Road(roadWidth, "textures/road.jpg");
 	loadTextures();
 	/*Floor::initTextures();
 	BuildingObject::initTexture();
@@ -190,8 +193,6 @@ void init_objects(){
 
 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 

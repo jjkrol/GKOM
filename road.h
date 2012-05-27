@@ -13,7 +13,7 @@ class Edge;
 class Road
 {
 public:
-	Road(float width, UINT * roadTexture);
+	Road(float width, char * roadTexture);
 	~Road(void);
 	void addPart(int x1, int y1, int z1, int x2, int y2, int z2);
 	void print();
@@ -27,5 +27,7 @@ private:
 	std::set<Edge*> edges;
 
 	void addUnitPart(int x1, int y1, int z1, int x2, int y2, int z2);
-	UINT * texture;
+	UINT roadTexture[1];
+	bool hasTextures;
+
 };

@@ -49,8 +49,8 @@ void Heightmap::load(){
 		}
 		p.t[0] = (float)i/denominator;
 		p.t[1] = 1 - (float)j/denominator;
-		p.t[2] = (float)(i+1)/denominator;
-		p.t[3] = 1 - (float)(j+1)/denominator;
+		p.t[2] = (float)(i+stepSize)/denominator;
+		p.t[3] = 1 - (float)(j+stepSize)/denominator;
 		heightMapCalculated[i][j] = p;
 }
 }
@@ -63,13 +63,15 @@ void Heightmap::draw(){
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, heightmapTexture[0]);
 		   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glBegin( GL_QUADS ); 
 		float denominator = (float)(mapSize-stepSize);
 	for (int i = 1; i < denominator; i += stepSize )
     for (int j = 1; j < denominator; j += stepSize ){
 		MyPolygon p = heightMapCalculated[i][j];
-		glNormal3fv(p.n); 
+		//glNormal3fv(p.n); 
 		glTexCoord2f(p.t[0], p.t[1]);
         glVertex3fv(p.v[0]);
 		glTexCoord2f(p.t[0], p.t[3]);

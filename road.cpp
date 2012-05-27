@@ -3,8 +3,18 @@
 
 using namespace std;
 
-Road::Road(float width, UINT * roadTexture):
-width(width),texture(roadTexture){
+Road::Road(float width, char * fileName):
+width(width){
+	if(fileName){
+		ilInit();
+		iluInit();
+		ilutRenderer(ILUT_OPENGL);
+		roadTexture[0] = ilutGLLoadImage(fileName);
+		hasTextures = true;
+	}
+	else{
+		hasTextures = false;
+	}
 	segmentSize = 10;
 	floorHeight = 10;
 }
@@ -109,13 +119,18 @@ void Road::draw(){
 	//draw joints
 	double d = width/2;
 	set<Vertex*>::iterator vertIt;
+
 	for(vertIt = vertices.begin(); vertIt != vertices.end(); vertIt++){
 		Vertex * v = (*vertIt);
+
 		double x = v->x;
 		double y = v->y;
 		double z = v->z;
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);  
+
+		if(hasTextures){
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, roadTexture[0]);  
+		}
 		glColor3f(0.5f,0.5f,1.0f); 
 		glBegin(GL_QUADS);		
 			glTexCoord2f(0.0f, 1.0f);
@@ -127,7 +142,9 @@ void Road::draw(){
 			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(x-d, y-d, z);
 		glEnd();
-	glDisable(GL_TEXTURE_2D);
+		if(hasTextures){
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 
 	//draw connections
@@ -181,9 +198,14 @@ void Road::draw(){
 
 		z1 = z2 = v1->z;
 		z3 = z4 = v2->z;
-	ratio = length/width;	
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);  
+
+		ratio = length/width;	
+
+		if(hasTextures){
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, roadTexture[0]);  
+		}
+
 		glColor3f(0.5f,0.5f,1.0f);    
 		glBegin(GL_QUADS);		
 			glTexCoord2f(0.0f, 1.0f*ratio);
@@ -195,7 +217,9 @@ void Road::draw(){
 			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(x4,y4,z4);
 		glEnd();
-	glDisable(GL_TEXTURE_2D);
+		if(hasTextures){
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 }
 

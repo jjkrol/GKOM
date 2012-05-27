@@ -6,6 +6,7 @@ void Car::setNewTarget(){
 	targetVertex = road->getRandomVertex();
 	arr->setTarget(targetVertex);
 }
+
 Car::Car(Road * road, int id):road(road),id(id),ep(0.01),baseEp(0.01),
 	height(1.5), speed(0.05), turning(true), showArrow(true),
 showNextPoint(true), nextTurn(NONE), rotX(90), rotY(0), rotZ(0){
@@ -75,22 +76,21 @@ Direction Car::getNextTurn(){
 void Car::move(){
 	double eps = speed*2;
 	ep = baseEp * speed/0.05;
+
+	//got to the green box?
 	if(	abs(targetVertex->x-x) < road->width &&
 		abs(targetVertex->y-y) < road->width &&
 		abs(targetVertex->z-z) < road->width){
 		setNewTarget();
 		std::cout<<"Udalo sie"<<std::endl;
 	}
-	vec[1] = target[1]-y;
-	vec[2] = target[2]-z;
 
+	//calculate distanse to target
 	vec[0] = target[0]-x;
 	vec[1] = target[1]-y;
 	vec[2] = target[2]-z;
-	//create velocity vector
-	if(abs(vec[0]) < eps && abs(vec[1]) < eps && abs(vec[2]) < eps){ //we got to the point
-			//cout<<"Got to the point"<<endl;
 
+	if(abs(vec[0]) < eps && abs(vec[1]) < eps && abs(vec[2]) < eps){ //we got to the point
 		if(turning){
 			if(turningCount >= 0){
 				target[0] = turningTargets[turningCount][0];
@@ -117,12 +117,95 @@ void Car::move(){
 			//get turning direction
 			float dx = target[0] - x;
 			float dy = target[1] - y;
+
+			float relZ;
+			float dNextVertZ = nextVertex->z - currentVertex->z;
+			if(abs(dNextVertZ) > ep)
+				if(dNextVertZ > 0)
+					relZ = 0.1;
+				else
+					relZ = -0.1;
+			else 
+				relZ = 0;
+
 			if(abs(dx) < ep || abs(dy) < ep){
 				ridingTurn = STRAIGHT;
-				turningTargets[0][0] = target[0];	
-				turningTargets[0][1] = target[1];	
-				turningTargets[0][2] = target[2];	
-				turningCount = 0;
+				float addZ;
+
+				int n = floor(road->width/2/eps);
+				int m = n;
+				if(dNextVertZ < 0){
+					cout<<"terrraazz"<<endl;
+					m += n;
+				}
+				if(abs(dx)>ep){
+					if(dx<0)
+						turningTargets[m][0] = x-road->width/2/n;	
+					else
+						turningTargets[m][0] = x+road->width/2/n;	
+					turningTargets[m][1] = y;
+				}
+				else{
+					if(dy<0)
+						turningTargets[m][1] = y-road->width/2/n;	
+					else
+						turningTargets[m][1] = y+road->width/2/n;	
+					turningTargets[m][0] = x;
+				}
+
+				turningTargets[m][2] = z+relZ;
+
+				for(int i = 1; i <=n; ++i){
+					switch(ridingDir){
+					case NORTH:
+						turningTargets[m-i][1] = turningTargets[m-i+1][1]+road->width/2/n;	
+						turningTargets[m-i][0] = x;
+						break;
+					case SOUTH:
+						turningTargets[m-i][1] = turningTargets[m-i+1][1]-road->width/2/n;	
+						turningTargets[m-i][0] = x;
+						break;
+					case EAST:
+						turningTargets[m-i][0] = turningTargets[m-i+1][0]+road->width/2/n;	
+						turningTargets[m-i][1] = y;
+						break;
+					case WEST:
+						turningTargets[m-i][0] = turningTargets[m-i+1][0]-road->width/2/n;	
+						turningTargets[m-i][1] = y;
+						break;
+					}
+
+				float fact = (abs(turningTargets[m-i+1][0]+
+					road->width/2/n-x))/road->width;
+				if(n==m)
+					turningTargets[m-i][2] = turningTargets[m-i+1][2]+relZ*fact;
+				else
+					turningTargets[m-i][2] = turningTargets[m-i+1][2];	
+				}
+				if(n!=m){
+					cout<<"teraz"<<endl;
+					for(int i = n+1; i <= m; ++i){
+						float addX, addY, addZ;
+						switch(ridingDir){
+							case NORTH:
+							case SOUTH:
+								addX = 0;
+								addY = -speed;
+								break;
+							case EAST:
+							case WEST:
+								addX = -speed;
+								addY = 0;
+								break;
+							}
+						turningTargets[m-i][0] = turningTargets[m-i+1][0]+addX;
+						turningTargets[m-i][1] = turningTargets[m-i+1][1]+addY;
+
+						addZ = relZ*((float)(i-n)/(float)n)/1.5;
+						turningTargets[m-i][2] = turningTargets[m-i+1][2] + addZ;
+					}
+				}
+				turningCount = m;
 			}
 			else{
 				ridingTurn = LEFT;
@@ -155,10 +238,13 @@ void Car::move(){
 				else
 					cout<<"Blad! x -y"<<endl;
 			
-			//for(turningCount = 0; turningCount < 2; turningCount++){
-			//}
 			float a = speed;
 			int n = M_PI/(4*asin(a/(2*road->width/2)));
+			int m = n;
+			if(dNextVertZ < 0){
+				cout<<"terrraazz"<<endl;
+				m += n;
+			}
 			if (n > 200) n = 200;
 
 			float angleStep = (float)360/(float)n/(float)4;
@@ -167,36 +253,76 @@ void Car::move(){
 			float angle = angleStep;
 			double prevPoint[3] = {x,y,z};
 
-			for(int i = 0; i <= n; i++){
-			float relY = cos(angle*M_PI/180)*a;
-			float relX = sin(angle*M_PI/180)*a;
+			for(int i = 0; i <= n; ++i){
+				float relY = cos(angle*M_PI/180)*a;
+				float relX = sin(angle*M_PI/180)*a;
 
-			float addX;
-			float addY;
-			
-			if(ridingDir == NORTH){
-				addY = relY;
+				float addX, addY, addZ;
+
+				switch(ridingDir){
+				case NORTH:
+					addY = relY;
 					addX = relX;
-			}
-			if(ridingDir == SOUTH){
-				addY = -relY;
+					break;
+				case SOUTH:
+					addY = -relY;
 					addX = -relX;
-			}
-			if(ridingDir == EAST){
-				addX = relY;
+					break;
+				case EAST:
 					addY = -relX;
-			}
-			if(ridingDir == WEST){
-				addX = - relY;
+					addX = relY;
+					break;
+				case WEST:
 					addY = relX;
+					addX = - relY;
+					break;
+				}
+				prevPoint[0] = turningTargets[m-i][0] = prevPoint[0]+addX;
+				prevPoint[1] = turningTargets[m-i][1] = prevPoint[1]+addY;
+				float fact = (abs(prevPoint[0]+addX-x))/road->width;
+				//addZ = relZ* ((float)i/(float)n);
+				if(i>n/2 && n==m)
+					prevPoint[2] = 
+					turningTargets[m-i][2] = 
+					prevPoint[2] + relZ * fact;
+				else
+					prevPoint[2] = turningTargets[m-i][2] = prevPoint[2];
+
+				angle += angleStep;
 			}
-			prevPoint[0] = turningTargets[n-i][0] = prevPoint[0]+addX;
-			prevPoint[1] = turningTargets[n-i][1] = prevPoint[1]+addY;
-			prevPoint[2] = turningTargets[n-i][2] = prevPoint[2];
-			angle += angleStep;
+			if(n!=m){
+				cout<<"teraz"<<endl;
+				float relY = cos(angle*M_PI/180)*a;
+				float relX = sin(angle*M_PI/180)*a;
+			for(int i = n+1; i <= m; ++i){
+				float addX, addY, addZ;
+				switch(ridingDir){
+				case NORTH:
+					addY = 0;
+					addX = -speed;
+					break;
+				case SOUTH:
+					addY = 0;
+					addX = -speed;
+					break;
+				case EAST:
+					addY = -speed;
+					addX = 0;
+					break;
+				case WEST:
+					addY = -speed;
+					addX = 0;
+					break;
+				}
+				prevPoint[0] = turningTargets[m-i][0] = prevPoint[0]+addX;
+				prevPoint[1] = turningTargets[m-i][1] = prevPoint[1]+addY;
+
+				addZ = relZ*((float)(i-n)/(float)n)/1.5;
+					prevPoint[2] = turningTargets[m-i][2] = prevPoint[2] + addZ;
+			}
 			}
 
-			turningCount = n;
+			turningCount = m;
 			}
 				target[0] = turningTargets[turningCount][0];
 				target[1] = turningTargets[turningCount][1];
